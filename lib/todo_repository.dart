@@ -3,7 +3,11 @@ import 'package:amplify_flutter/amplify_flutter.dart';
 import 'models/Todo.dart';
 
 class TodoRepository {
-  
+
+  Stream observeTodos() {
+    return Amplify.DataStore.observe(Todo.classType);
+  }
+
   Future<List<Todo>> getTodos() async {
     try {
       final todos = await Amplify.DataStore.query(Todo.classType);
@@ -26,6 +30,13 @@ class TodoRepository {
     final updatedTodo = todo.copyWith(isComplete: isComplete);
     try {
       await Amplify.DataStore.save(updatedTodo);
+    } catch (e) {
+      rethrow;
+    }
+  }
+  Future<void> deletToDo(Todo todo) async {
+    try {
+      await Amplify.DataStore.delete(todo);
     } catch (e) {
       rethrow;
     }

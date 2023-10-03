@@ -83,14 +83,33 @@ class _TodosViewState extends State<TodosView> {
       itemCount: todos.length,
       itemBuilder: (context, index) {
         final todo = todos[index];
-        return Card(
-          child: CheckboxListTile(
+        return Dismissible(
+          key: Key(todo.id), // Provide a unique key for each item
+          onDismissed: (direction) {
+            // Handle the dismiss action here (e.g., delete the todo)
+            BlocProvider.of<TodoCubit>(context).deleteTodo(todo);
+          },
+        
+          background: Container(
+            color: Colors.red,
+            alignment: Alignment.centerRight,
+            padding: const EdgeInsets.only(right: 20),
+            child: const Icon(
+              Icons.delete,
+              color: Colors.white,
+              size: 30,
+            ),
+          ),
+          child: Card(
+            child: CheckboxListTile(
               title: Text(todo.title),
               value: todo.isComplete,
               onChanged: (newValue) {
                 BlocProvider.of<TodoCubit>(context)
                     .updateTodoIsComplete(todo, newValue!);
-              }),
+              },
+            ),
+          ),
         );
       },
     );

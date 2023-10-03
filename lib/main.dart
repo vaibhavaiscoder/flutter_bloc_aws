@@ -1,3 +1,5 @@
+import 'package:amplify_api/amplify_api.dart';
+import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
 import 'package:amplify_datastore/amplify_datastore.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:flutter/material.dart';
@@ -32,23 +34,26 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
         home: BlocProvider(
-            create: (context) => TodoCubit()..getTodos(),
+            create: (context) => TodoCubit()..getTodos()..observeTodo(),
             child:
                 _amplifyConfigured ? const TodosView() : const LoadingView()));
   }
-
-  void _configureAmplify() async {
-    Amplify.addPlugin(AmplifyDataStore(modelProvider: ModelProvider.instance));
-
+  
+void _configureAmplify() async {
     // Once Plugins are added, configure Amplify
     try {
+      await Future.wait([
+        Amplify.addPlugin(
+            AmplifyDataStore(modelProvider: ModelProvider.instance)),
+        Amplify.addPlugin(AmplifyAPI()),
+        Amplify.addPlugin(AmplifyAuthCognito())
+      ]);
       await Amplify.configure(amplifyconfig);
+      setState(() {
+        _amplifyConfigured = true;
+      });
     } catch (e) {
       print(e);
     }
-
-    setState(() {
-      _amplifyConfigured = true;
-    });
   }
 }
