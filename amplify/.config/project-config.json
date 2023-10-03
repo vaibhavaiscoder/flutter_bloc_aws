@@ -1,0 +1,13 @@
+{
+  "projectName": "to_do_app_aws_block",
+  "version": "2.0",
+  "frontend": "flutter",
+  "providers": [
+    "awscloudformation"
+  ],
+  "flutter": {
+    "config": {
+      "ResDir": "./lib/"
+    }
+  }
+}
