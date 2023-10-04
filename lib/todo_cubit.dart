@@ -1,8 +1,6 @@
-
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:to_do_app_aws_block/models/Todo.dart';
 import 'package:to_do_app_aws_block/todo_repository.dart';
-
 
 abstract class TodoState {}
 
@@ -17,13 +15,14 @@ class ListTodosSuccess extends TodoState {
 class ListTodosFailure extends TodoState {
   final Exception? exception;
 
-  ListTodosFailure({ this.exception});
+  ListTodosFailure({this.exception});
 }
 
 class TodoCubit extends Cubit<TodoState> {
   final _todoRepo = TodoRepository();
+  final String userId;
 
-  TodoCubit() : super(LoadingTodos());
+  TodoCubit({required this.userId}) : super(LoadingTodos());
 
   void getTodos() async {
     if (state is ListTodosSuccess == false) {
@@ -31,20 +30,20 @@ class TodoCubit extends Cubit<TodoState> {
     }
 
     try {
-      final todos = await _todoRepo.getTodos();
+      final todos = await _todoRepo.getTodos(userId);
       emit(ListTodosSuccess(todos: todos));
-    }on Exception catch (e) {
+    } on Exception catch (e) {
       emit(ListTodosFailure(exception: e));
     }
   }
 
-void observeTodo() {
+  void observeTodo() {
     final todosStream = _todoRepo.observeTodos();
     todosStream.listen((_) => getTodos());
   }
 
   void createTodo(String title) async {
-    await _todoRepo.createTodo(title);
+    await _todoRepo.createTodo(title, userId);
     getTodos();
   }
 
@@ -52,9 +51,9 @@ void observeTodo() {
     await _todoRepo.updateTodoIsComplete(todo, isComplete);
     getTodos();
   }
+
   void deleteTodo(Todo todo) async {
     await _todoRepo.deletToDo(todo);
     getTodos();
   }
-  
 }

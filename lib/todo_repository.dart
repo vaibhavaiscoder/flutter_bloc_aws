@@ -8,17 +8,17 @@ class TodoRepository {
     return Amplify.DataStore.observe(Todo.classType);
   }
 
-  Future<List<Todo>> getTodos() async {
+  Future<List<Todo>> getTodos(String userId) async {
     try {
-      final todos = await Amplify.DataStore.query(Todo.classType);
+      final todos = await Amplify.DataStore.query(Todo.classType, where: Todo.USERID.eq(userId));
       return todos;
     } catch (e) {
       rethrow;
     }
   }
 
-  Future<void> createTodo(String title) async {
-    final newTodo = Todo(title: title, isComplete: false);
+  Future<void> createTodo(String title, String userId) async {
+    final newTodo = Todo(title: title, isComplete: false, userId: userId);
     try {
       await Amplify.DataStore.save(newTodo);
     } catch (e) {

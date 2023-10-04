@@ -64,4 +64,6 @@ flutter {
     source '../..'
 }
 
-dependencies {}
+dependencies {
+//    implementation('com.amazonaws:aws-android-sdk-cognitoauth:2.16.7') { transitive=true }
+}

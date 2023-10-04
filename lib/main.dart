@@ -5,6 +5,8 @@ import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:to_do_app_aws_block/amplifyconfiguration.dart';
+import 'package:to_do_app_aws_block/app_navigator.dart';
+import 'package:to_do_app_aws_block/auth_cubit.dart';
 import 'package:to_do_app_aws_block/models/ModelProvider.dart';
 import 'package:to_do_app_aws_block/todo_cubit.dart';
 import 'package:to_do_app_aws_block/todos_view.dart';
@@ -34,12 +36,13 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
         home: BlocProvider(
-            create: (context) => TodoCubit()..getTodos()..observeTodo(),
-            child:
-                _amplifyConfigured ? const TodosView() : const LoadingView()));
+            create: (context) => AuthCubit()..attemptAutoSignIn(),
+            child: _amplifyConfigured
+                ? const AppNavigator()
+                : const LoadingView()));
   }
-  
-void _configureAmplify() async {
+
+  void _configureAmplify() async {
     // Once Plugins are added, configure Amplify
     try {
       await Future.wait([
@@ -52,6 +55,7 @@ void _configureAmplify() async {
       setState(() {
         _amplifyConfigured = true;
       });
+      // Amplify.DataStore.clear();
     } catch (e) {
       print(e);
     }

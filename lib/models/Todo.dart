@@ -29,6 +29,7 @@ class Todo extends amplify_core.Model {
   final String id;
   final String? _title;
   final bool? _isComplete;
+  final String? _userId;
   final amplify_core.TemporalDateTime? _createdAt;
   final amplify_core.TemporalDateTime? _updatedAt;
 
@@ -58,8 +59,30 @@ class Todo extends amplify_core.Model {
     }
   }
   
-  bool? get isComplete {
-    return _isComplete;
+  bool get isComplete {
+    try {
+      return _isComplete!;
+    } catch(e) {
+      throw amplify_core.AmplifyCodeGenModelException(
+          amplify_core.AmplifyExceptionMessages.codeGenRequiredFieldForceCastExceptionMessage,
+          recoverySuggestion:
+            amplify_core.AmplifyExceptionMessages.codeGenRequiredFieldForceCastRecoverySuggestion,
+          underlyingException: e.toString()
+          );
+    }
+  }
+  
+  String get userId {
+    try {
+      return _userId!;
+    } catch(e) {
+      throw amplify_core.AmplifyCodeGenModelException(
+          amplify_core.AmplifyExceptionMessages.codeGenRequiredFieldForceCastExceptionMessage,
+          recoverySuggestion:
+            amplify_core.AmplifyExceptionMessages.codeGenRequiredFieldForceCastRecoverySuggestion,
+          underlyingException: e.toString()
+          );
+    }
   }
   
   amplify_core.TemporalDateTime? get createdAt {
@@ -70,13 +93,14 @@ class Todo extends amplify_core.Model {
     return _updatedAt;
   }
   
-  const Todo._internal({required this.id, required title, isComplete, createdAt, updatedAt}): _title = title, _isComplete = isComplete, _createdAt = createdAt, _updatedAt = updatedAt;
+  const Todo._internal({required this.id, required title, required isComplete, required userId, createdAt, updatedAt}): _title = title, _isComplete = isComplete, _userId = userId, _createdAt = createdAt, _updatedAt = updatedAt;
   
-  factory Todo({String? id, required String title, bool? isComplete}) {
+  factory Todo({String? id, required String title, required bool isComplete, required String userId}) {
     return Todo._internal(
       id: id == null ? amplify_core.UUID.getUUID() : id,
       title: title,
-      isComplete: isComplete);
+      isComplete: isComplete,
+      userId: userId);
   }
   
   bool equals(Object other) {
@@ -89,7 +113,8 @@ class Todo extends amplify_core.Model {
     return other is Todo &&
       id == other.id &&
       _title == other._title &&
-      _isComplete == other._isComplete;
+      _isComplete == other._isComplete &&
+      _userId == other._userId;
   }
   
   @override
@@ -103,6 +128,7 @@ class Todo extends amplify_core.Model {
     buffer.write("id=" + "$id" + ", ");
     buffer.write("title=" + "$_title" + ", ");
     buffer.write("isComplete=" + (_isComplete != null ? _isComplete!.toString() : "null") + ", ");
+    buffer.write("userId=" + "$_userId" + ", ");
     buffer.write("createdAt=" + (_createdAt != null ? _createdAt!.format() : "null") + ", ");
     buffer.write("updatedAt=" + (_updatedAt != null ? _updatedAt!.format() : "null"));
     buffer.write("}");
@@ -110,21 +136,24 @@ class Todo extends amplify_core.Model {
     return buffer.toString();
   }
   
-  Todo copyWith({String? title, bool? isComplete}) {
+  Todo copyWith({String? title, bool? isComplete, String? userId}) {
     return Todo._internal(
       id: id,
       title: title ?? this.title,
-      isComplete: isComplete ?? this.isComplete);
+      isComplete: isComplete ?? this.isComplete,
+      userId: userId ?? this.userId);
   }
   
   Todo copyWithModelFieldValues({
     ModelFieldValue<String>? title,
-    ModelFieldValue<bool?>? isComplete
+    ModelFieldValue<bool>? isComplete,
+    ModelFieldValue<String>? userId
   }) {
     return Todo._internal(
       id: id,
       title: title == null ? this.title : title.value,
-      isComplete: isComplete == null ? this.isComplete : isComplete.value
+      isComplete: isComplete == null ? this.isComplete : isComplete.value,
+      userId: userId == null ? this.userId : userId.value
     );
   }
   
@@ -132,17 +161,19 @@ class Todo extends amplify_core.Model {
     : id = json['id'],
       _title = json['title'],
       _isComplete = json['isComplete'],
+      _userId = json['userId'],
       _createdAt = json['createdAt'] != null ? amplify_core.TemporalDateTime.fromString(json['createdAt']) : null,
       _updatedAt = json['updatedAt'] != null ? amplify_core.TemporalDateTime.fromString(json['updatedAt']) : null;
   
   Map<String, dynamic> toJson() => {
-    'id': id, 'title': _title, 'isComplete': _isComplete, 'createdAt': _createdAt?.format(), 'updatedAt': _updatedAt?.format()
+    'id': id, 'title': _title, 'isComplete': _isComplete, 'userId': _userId, 'createdAt': _createdAt?.format(), 'updatedAt': _updatedAt?.format()
   };
   
   Map<String, Object?> toMap() => {
     'id': id,
     'title': _title,
     'isComplete': _isComplete,
+    'userId': _userId,
     'createdAt': _createdAt,
     'updatedAt': _updatedAt
   };
@@ -151,6 +182,7 @@ class Todo extends amplify_core.Model {
   static final ID = amplify_core.QueryField(fieldName: "id");
   static final TITLE = amplify_core.QueryField(fieldName: "title");
   static final ISCOMPLETE = amplify_core.QueryField(fieldName: "isComplete");
+  static final USERID = amplify_core.QueryField(fieldName: "userId");
   static var schema = amplify_core.Model.defineSchema(define: (amplify_core.ModelSchemaDefinition modelSchemaDefinition) {
     modelSchemaDefinition.name = "Todo";
     modelSchemaDefinition.pluralName = "Todos";
@@ -176,8 +208,14 @@ class Todo extends amplify_core.Model {
     
     modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.field(
       key: Todo.ISCOMPLETE,
-      isRequired: false,
+      isRequired: true,
       ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.bool)
+    ));
+    
+    modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.field(
+      key: Todo.USERID,
+      isRequired: true,
+      ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.string)
     ));
     
     modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.nonQueryField(
